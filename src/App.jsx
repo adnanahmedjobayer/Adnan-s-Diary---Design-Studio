@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import './App.css';
 import TopBar from './components/TopBar';
 import CanvasArea from './components/CanvasArea';
@@ -1218,6 +1219,7 @@ export default function App() {
         onMultiLock={handleMultiLock}
         onMultiToggleVisible={handleMultiToggleVisible}
       />
+      <SpeedInsights />
     </div>
   );
 }
