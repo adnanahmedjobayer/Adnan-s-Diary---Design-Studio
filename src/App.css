@@ -1,0 +1,1325 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: #0b0e14;
+  color: #e2e8f0;
+  font-family: 'Hind Siliguri', 'Poppins', sans-serif;
+  display: flex;
+  justify-content: center;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.app-container {
+  width: 100vw;
+  max-width: 460px;
+  height: 100dvh;
+  background: linear-gradient(180deg, #121722 0%, #0d1118 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+/* --- TopBar (২ লাইনের সেড ব্লু বার) --- */
+.topbar-wrapper {
+  background: linear-gradient(135deg, #1b2838 0%, #243b55 50%, #141e30 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 30;
+}
+
+.topbar-row-1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px 4px;
+}
+
+.brand-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(90deg, #e0c3fc, #8ec5fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-btn:active {
+  transform: scale(0.92);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.topbar-row-2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px 8px;
+  background: rgba(10, 15, 25, 0.35);
+  gap: 6px;
+}
+
+.edit-pill {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 20px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.edit-pill button {
+  border: none;
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.edit-pill .btn-edit {
+  background: #243b55;
+  color: #fff;
+}
+
+.edit-pill .btn-del {
+  color: #dc2626;
+  padding: 4px 7px;
+}
+
+.tool-pills {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: #fff;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 13px;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.badge-btn.active {
+  background: #64748b;
+  color: #fff;
+  box-shadow: 0 0 8px rgba(148, 163, 184, 0.4);
+}
+
+/* --- CanvasArea --- */
+.canvas-workspace {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  background: radial-gradient(circle at center, #1a202c 0%, #0d1117 100%);
+}
+
+.canvas-box {
+  width: 330px;
+  height: 330px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  touch-action: none;
+}
+
+.canvas-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.canvas-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.grid-lines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.18) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.18) 1px, transparent 1px);
+  background-size: 33.33% 33.33%;
+}
+
+.snap-line-v {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: #f43f5e;
+  z-index: 45;
+  pointer-events: none;
+}
+
+.snap-line-h {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #f43f5e;
+  z-index: 45;
+  pointer-events: none;
+}
+
+/* লেয়ার ও সিলেকশন হ্যান্ডেল */
+.layer-item {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: move;
+  text-align: center;
+  word-break: break-word;
+}
+
+.layer-selected {
+  outline: 1.5px dashed rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.handle-width-l,
+.handle-width-r {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border: 2px solid #243b55;
+  border-radius: 50%;
+  cursor: ew-resize;
+}
+
+.handle-width-l { left: -7px; }
+.handle-width-r { right: -7px; }
+
+.handle-rotate {
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 18px;
+  background: #cbd5e1;
+  color: #0f172a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  cursor: grab;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Canvas Zoom Mode স্লাইডার বার --- */
+.canvas-zoom-hud {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 70;
+}
+
+.canvas-zoom-bar {
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 999px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.65);
+  width: 265px;
+}
+
+.canvas-zoom-bar input[type="range"] {
+  flex: 1;
+  min-width: 75px;
+  accent-color: #38bdf8;
+}
+
+.canvas-zoom-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #38bdf8;
+  min-width: 36px;
+  text-align: center;
+}
+
+.canvas-zoom-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.canvas-zoom-btn:active {
+  transform: scale(0.92);
+  background: rgba(56, 189, 248, 0.25);
+}
+
+/* --- MiddleStrip --- */
+.middle-strip {
+  background: #161c28;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 10px;
+  max-height: 165px;
+  overflow-y: auto;
+}
+
+.strip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.scroll-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+.theme-card {
+  min-width: 74px;
+  height: 74px;
+  border-radius: 12px;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-card span {
+  font-size: 10px;
+  font-weight: 700;
+  z-index: 2;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.chip-btn {
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.chip-btn.active {
+  background: #334155;
+  border-color: #94a3b8;
+  color: #fff;
+}
+
+.shape-item {
+  min-width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
+  accent-color: #94a3b8;
+}
+
+/* --- BottomNav (একদম নিচের ৫টা বাটন) --- */
+.bottom-nav {
+  display: flex;
+  background: #0f131c;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  height: 56px;
+  z-index: 30;
+}
+
+.nav-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+}
+
+.nav-btn.active {
+  color: #cbd5e1;
+}
+
+.nav-btn.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 28px;
+  height: 3px;
+  background: #94a3b8;
+  border-radius: 0 0 4px 4px;
+}
+
+/* --- Modal --- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 390px;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 16px;
+  color: #f8fafc;
+}
+
+.modal-textarea {
+  width: 100%;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 10px;
+  color: #fff;
+  font-size: 15px;
+  margin: 10px 0;
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #334155, #475569);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #94a3b8;
+  border: 1px solid #334155;
+  padding: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+/* --- প্রিমিয়াম লেয়ার প্যানেল ড্রয়ার (বাম দিক থেকে আসবে) --- */
+.layer-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 15, 0.65);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.layer-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: linear-gradient(180deg, #161e2e 0%, #0f1522 100%);
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+  z-index: 101;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.85);
+  animation: slideInLeft 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.layer-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: linear-gradient(135deg, #1b2838, #243b55);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.layer-close-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: #f8fafc;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.layer-list-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 8px;
+}
+
+/* পিক্সেলল্যাব স্টাইল প্রিমিয়াম লেয়ার কার্ড */
+.px-layer-card {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.px-layer-card.active {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: #38bdf8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.px-layer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 8px;
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.px-drag-grip {
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.px-layer-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f1f5f9;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ডানপাশের ২x২ আইকন গ্রিড (Lock, Edit, Eye, Trash) */
+.px-layer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 32px);
+  grid-template-rows: repeat(2, 28px);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.px-grid-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.px-grid-btn:nth-child(2n) {
+  border-right: none;
+}
+
+.px-grid-btn:nth-child(n+3) {
+  border-bottom: none;
+}
+
+.px-grid-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.px-grid-btn.is-locked {
+  color: #fbbf24;
+}
+
+.px-grid-btn.is-hidden {
+  color: #f43f5e;
+}
+
+.px-grid-btn.is-del:hover {
+  color: #f43f5e;
+}
+
+/* নিচের মাল্টি-সিলেক্ট বার */
+.layer-drawer-footer {
+  padding: 10px;
+  background: #0b0f19;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.footer-tool-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  width: 38px;
+  height: 34px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.footer-tool-btn.active {
+  background: #0284c7;
+  color: #fff;
+  border-color: #38bdf8;
+}
+
+/* --- TopBar ড্রপডাউন মেনু --- */
+.topbar-dropdown-wrap {
+  position: relative;
+}
+
+.icon-btn.active {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.topbar-dropdown-menu {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  min-width: 175px;
+  background: #1a2333;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dropdown-item {
+  background: transparent;
+  border: none;
+  color: #e2e8f0;
+  padding: 9px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.dropdown-item:hover,
+.dropdown-item:active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* --- ড্রোয়িং মোড ও টুলবার --- */
+.draw-canvas-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 60;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.draw-toolbar {
+  margin-top: 8px;
+  width: 330px;
+  background: #161c28;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 14px;
+  padding: 7px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  z-index: 65;
+}
+
+.draw-colors {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.draw-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.draw-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #f1f5f9;
+  padding: 5px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.draw-btn.cancel {
+  color: #fda4af;
+}
+
+.draw-btn.done {
+  background: #0284c7;
+  color: #fff;
+}
+
+/* --- ফুল স্ক্রিন প্রিভিউ মডাল ও জুম বার --- */
+.fullscreen-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 8, 15, 0.96);
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.fullscreen-close-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 155;
+}
+
+.fullscreen-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  overflow: hidden;
+}
+
+.fullscreen-zoom-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 156;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.fs-zoom-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.fs-zoom-btn:active {
+  transform: scale(0.92);
+  background: rgba(56, 189, 248, 0.25);
+}
+
+.fs-zoom-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e2e8f0;
+  min-width: 42px;
+  text-align: center;
+}
+
+/* --- টেক্সট ও শেপ টুলস স্ক্রল বার --- */
+.px-tool-scroll {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  padding: 4px 2px;
+}
+
+.px-tool-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.px-tool-item {
+  min-width: 64px;
+  padding: 8px 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.px-tool-item span {
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.px-tool-item:active {
+  transform: scale(0.95);
+  background: rgba(56, 189, 248, 0.18);
+  border-color: #38bdf8;
+}
+
+.px-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.px-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #f8fafc;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.px-editor-body {
+  padding: 2px 0;
+}
+
+.px-mini-grid {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.px-toggle-pill {
+  padding: 5px 11px;
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.px-toggle-pill.on {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #fff;
+}
+
+.asset-del-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #e11d48;
+  color: #fff;
+  border: 1.5px solid #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  padding: 0;
+}
+
+/* ট্রান্সপারেন্ট ক্যানভাস চেকারবোর্ড */
+.canvas-transparent-bg {
+  background-color: #1e293b;
+  background-image:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.1) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.1) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+
+.px-size-input {
+  width: 64px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #f8fafc;
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-size: 12px;
+  outline: none;
+}
+
+/* --- PixelLab-স্টাইল ফুল-স্ক্রিন ক্রপ মডাল (BgCropModal) --- */
+.px-crop-overlay {
+  position: fixed;
+  inset: 0;
+  background: #0b0e14;
+  z-index: 220;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.px-crop-topbar {
+  height: 48px;
+  background: #1b2434;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.px-crop-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #05070b;
+  overflow: hidden;
+  padding: 10px;
+  touch-action: none;
+}
+
+.px-crop-box {
+  position: absolute;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.58);
+  box-sizing: border-box;
+  cursor: move;
+  touch-action: none;
+  z-index: 2;
+}
+
+.px-crop-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 1px, transparent 1px);
+  background-size: 33.33% 33.33%;
+}
+
+.px-crop-handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border: 2px solid #0f172a;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+.px-crop-bottom {
+  background: #141a26;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.px-crop-ratios {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.px-crop-ratios::-webkit-scrollbar {
+  display: none;
+}
+
+.px-ratio-btn {
+  min-width: 50px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 5px 6px;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.px-ratio-btn.active {
+  border-color: #38bdf8;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+}
+
+.px-crop-tools-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.px-crop-actions-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #0f141e;
+}
+
+.px-crop-bar-btn {
+  height: 44px;
+  background: transparent;
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.px-crop-bar-btn:last-child {
+  border-right: none;
+}
+
+.px-crop-bar-btn.active {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+}
+
+/* --- Bottom-Right রিসাইজ/স্কেল হ্যান্ডেল ও স্মার্ট গাইড --- */
+.handle-scale-br {
+  position: absolute;
+  bottom: -9px;
+  right: -9px;
+  width: 20px;
+  height: 20px;
+  background: #38bdf8;
+  color: #0f172a;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: nwse-resize;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.55);
+  z-index: 6;
+}
+
+.handle-scale-br:active {
+  transform: scale(1.12);
+}
+
+.smart-guide-v {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  z-index: 46;
+  pointer-events: none;
+}
+
+.smart-guide-h {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  z-index: 46;
+  pointer-events: none;
+}
+
+.smart-spacing-bar {
+  position: absolute;
+  z-index: 47;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.smart-spacing-badge {
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.smart-hud-wrap {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 68;
+  pointer-events: none;
+}
+
+.smart-hud-pill {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e2e8f0;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+}
+
+.smart-hud-pill.is-snapped {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.smart-hud-tag {
+  font-size: 10px;
+  color: #fbbf24;
+  border-left: 1px solid rgba(255, 255, 255, 0.16);
+  padding-left: 6px;
+}
+
+/* --- স্মার্ট ডিজাইন গাইড (Coach Modal) --- */
+.coach-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fbbf24;
+  border: 1.5px solid #141e30;
+}
+
+.coach-score-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.coach-score-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 3px solid #38bdf8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.coach-issue-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 9px 10px;
+}
+
+.coach-ok-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 12px;
+  color: #bbf7d0;
+}
